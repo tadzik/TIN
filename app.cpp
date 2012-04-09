@@ -18,13 +18,14 @@ CSGI::Response app(CSGI::Env& env)
         std::cerr << it->first << " => " << it->second << std::endl;
     }
 
-    std::string body = "Hello, world!";
+    resp.content = "Hello, world!";
+
     std::stringstream len;
-    len << body.length();
-    resp.first = 200;
-    resp.second.first["Content-Type"] = "text/plain";
-    resp.second.first["Content-Length"] = len.str().c_str();
-    resp.second.second = body;
+    len << resp.content.length();
+
+    resp.status = 200;
+    resp.headers["Content-Type"] = "text/plain";
+    resp.headers["Content-Length"] = len.str().c_str();
 
     return resp;
 }

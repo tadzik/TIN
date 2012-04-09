@@ -127,14 +127,14 @@ CSGI::Env CSGI::Server::parse_request(int fd)
 
 void CSGI::Server::send_response(Response& resp, int fd) {
     std::stringstream out;
-    out << "HTTP/1.1 " << resp.first << " OK\r\n";
+    out << "HTTP/1.1 " << resp.status << " OK\r\n";
     Headers::iterator it;
-    for (it = resp.second.first.begin();
-         it != resp.second.first.end();
+    for (it = resp.headers.begin();
+         it != resp.headers.end();
          it++) {
         out << it->first << ": " << it->second << "\r\n";
     }
     out << "\r\n";
-    out << resp.second.second << "\r\n";
+    out << resp.content << "\r\n";
     send(fd, out.str().c_str(), out.str().length(), 0);
 }

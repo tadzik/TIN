@@ -25,7 +25,11 @@ typedef int         Status;
 
 typedef std::pair<Headers, Body> Content;
 
-typedef std::pair<Status, Content> Response;
+struct Response {
+    Status  status;
+    Headers headers;
+    Body    content;
+};
 
 typedef Response(*Application)(Env&);
 
