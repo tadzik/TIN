@@ -10,42 +10,25 @@ std::string itoa(int i)
     return out.str();
 }
 
-CSGI::Response make_response(std::string body)
-{
-    CSGI::Response ret;
+class SimpleResponder : public CSGI::Application {
+public:
+    SimpleResponder(std::string msg) : msg_(msg) { }
 
-    ret.status = 200;
-    ret.headers["Content-Type"]   = "text/plain";
-    ret.headers["Content-Length"] = itoa(body.length());
-    ret.content = body;
+    virtual CSGI::Response operator()(CSGI::Env& e)
+    {
+        CSGI::Response ret;
 
-    return ret;
-}
+        ret.status = 200;
+        ret.headers["Content-Type"]   = "text/plain";
+        ret.headers["Content-Length"] = itoa(msg_.length());
+        ret.content = msg_;
 
-CSGI::Response hello_handler(CSGI::Env& e)
-{
-    return make_response("Hello, world!");
-    (void)e;
-}
-
-CSGI::Response aboot_handler(CSGI::Env& e)
-{
-    return make_response("Could you tell us again what your argument "
-                         "is all ABOUT?");
-    (void)e;
-}
-
-CSGI::Response placki_handler(CSGI::Env& e)
-{
-    return make_response("Lubię placki!");
-    (void)e;
-}
-
-CSGI::Response another_handler(CSGI::Env& e)
-{
-    return make_response("Another prick in the wall");
-    (void)e;
-}
+        return ret;
+        (void)e;
+    }
+private:
+    std::string msg_;
+};
 
 void assert_status(Dispatcher& d, const char * uri, int status)
 {
@@ -61,12 +44,18 @@ void assert_found(Dispatcher& d, const char * uri)
 
 int main()
 {
-    Dispatcher dispatcher(NULL);
+    Dispatcher dispatcher((CSGI::Application *)NULL);
 
-    dispatcher.add_handler("/hello",   hello_handler);
-    dispatcher.add_handler("aboot/",   aboot_handler);
-    dispatcher.add_handler("/placki/", placki_handler);
-    dispatcher.add_handler("another",  another_handler);
+    SimpleResponder hello("Hello, world!");
+    SimpleResponder aboot("Could you tell us again what your argument "
+                          "is all ABOUT?");
+    SimpleResponder placki("Lubię placki!");
+    SimpleResponder another("Another prick in the wall");
+
+    dispatcher.add_handler("/hello",   &hello);
+    dispatcher.add_handler("aboot/",   &aboot);
+    dispatcher.add_handler("/placki/", &placki);
+    dispatcher.add_handler("another",  &another);
 
     assert_found(dispatcher, "/hello");
     assert_found(dispatcher, "/hello/");

@@ -31,7 +31,11 @@ struct Response {
     Body    content;
 };
 
-typedef Response(*Application)(Env&);
+class Application {
+public:
+    virtual CSGI::Response operator()(CSGI::Env&) = 0;
+    virtual ~Application() { }
+};
 
 class Exception : public std::exception {
 public:
@@ -50,7 +54,7 @@ class InvalidRequest : public std::exception { };
 
 class Server {
 public:
-    Server(Application app, int port) : app_(app), port_(port)
+    Server(Application * app, int port) : app_(app), port_(port)
     {
         backlog_ = 10;
     }
@@ -60,7 +64,7 @@ private:
     void serve();
     Env  parse_request(int fd);
     void send_response(Response& resp, int fd);
-    Application app_;
+    Application *app_;
     struct addrinfo hints_, *res_;
     int             sockfd_;
     int port_;

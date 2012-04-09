@@ -76,7 +76,7 @@ void CSGI::Server::serve()
             close(newfd);
             continue;
         }
-        Response resp = app_(env);
+        Response resp = (*app_)(env);
         send_response(resp, newfd);
         close(newfd);
     }
