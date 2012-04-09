@@ -44,7 +44,7 @@ void Dispatcher::add_handler(std::string s, CSGI::Application * a)
     handlers_[stripslashes(s)] = a;
 }
 
-CSGI::Response Dispatcher::dispatch(CSGI::Env& env)
+CSGI::Response Dispatcher::operator()(CSGI::Env& env)
 {
     CSGI::Application *y = handlers_[stripslashes(env["REQUEST_URI"])];
     if (y != NULL) {

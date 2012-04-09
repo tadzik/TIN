@@ -6,13 +6,12 @@
 #include <map>
 #include <string>
 
-class Dispatcher {
+class Dispatcher : public CSGI::Application {
 public:
     Dispatcher(CSGI::Application *);
-    // dispatch() is a CSGI application itself. Cool, eh?
-    CSGI::Response dispatch(CSGI::Env&);
+    virtual CSGI::Response operator()(CSGI::Env&);
     void add_handler(std::string, CSGI::Application *);
-    ~Dispatcher()
+    virtual ~Dispatcher()
     {
         if (freedefaulthandler)
             delete default_handler_;

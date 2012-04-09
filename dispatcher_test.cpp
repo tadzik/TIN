@@ -34,7 +34,7 @@ void assert_status(Dispatcher& d, const char * uri, int status)
 {
     CSGI::Env env;
     env["REQUEST_URI"] = std::string(uri);
-    assert(d.dispatch(env).status == status);
+    assert(d(env).status == status);
 }
 
 void assert_found(Dispatcher& d, const char * uri)
