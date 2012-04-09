@@ -122,6 +122,15 @@ CSGI::Env CSGI::Server::parse_request(int fd)
         env[k] = v;
     }
 
+    if (env.count("HTTP_CONTENT-LENGTH")) {
+        int n = atoi(env["HTTP_CONTENT-LENGTH"].c_str());
+        char * buf = new char[n + 1];
+        s.read(buf, n);
+        buf[n] = '\0';
+        env["csgi.input"] = std::string(buf);
+        delete []buf;
+    }
+
     return env;
 }
 
