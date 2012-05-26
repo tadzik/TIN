@@ -14,6 +14,22 @@ struct Widget {
     int id_;
 };
 
+struct Auth {
+    virtual bool verify(std::string&, std::string&) = 0;
+};
+
+struct SimpleAuth : Auth {
+    std::map<std::string, std::string> users_;
+
+    virtual bool verify(std::string& user, std::string& pass) {
+        return users_[user].compare(pass) == 0;
+    }
+
+    void addUser(std::string user, std::string pass) {
+        users_[user] = pass;
+    }
+};
+
 struct TextField : Widget {
     virtual std::string getValue() = 0;
     virtual void        setValue(std::string&) { };
@@ -40,10 +56,13 @@ struct TextField : Widget {
 class Server : CSGI::Application {
     std::vector<Widget *> widgets_;
     std::map<std::string, Widget*> widgets_map_;
+    std::map<std::string, bool>    sessions_;
+    Auth * auth_;
     int nextID_;
 public:
     Server() : nextID_(0) { };
     void addWidget(Widget *);
+    void setAuth(Auth *a) { auth_ = a; }
     void run();
     CSGI::Response get(CSGI::Env&);
     virtual CSGI::Response operator()(CSGI::Env&);

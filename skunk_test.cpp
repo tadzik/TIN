@@ -28,5 +28,11 @@ int main(void) {
     srv->addWidget(new WielkiNapis());
     srv->addWidget(new PoleTekstowe("dupa"));
     srv->addWidget(new PoleTekstowe("cycki"));
+
+    Skunk::SimpleAuth *auth = new Skunk::SimpleAuth();
+    auth->addUser("admin", "dupa.8");
+
+    srv->setAuth(auth);
+
     srv->run();
 }
