@@ -44,16 +44,19 @@ CSGI::Response Skunk::Server::get(CSGI::Env& env) {
 
 CSGI::Response Skunk::Server::operator()(CSGI::Env& env) {
     if (env["REQUEST_METHOD"].compare("POST") == 0) {
-        char *token;
-        char *postdata = (char *)env["csgi.input"].c_str();
-        token = strtok(postdata, "=&");
-        while (token != NULL) {
-            std::string key   = std::string(token);
-            token = strtok(NULL, "=&");
-            std::string value = std::string(token);
-            token = strtok(NULL, "=&");
+        std::string src = env["csgi.input"].c_str();
+        std::string part, key, val;
+        size_t from = 0, amp, eq;
 
-            widgets_map_[key]->POST(value);
+        for (;;) {
+            amp  = src.substr(from).find("&");
+            part = src.substr(from, amp);
+            eq   = part.find("=");
+            key  = part.substr(0, eq);
+            val  = part.substr(eq + 1);
+            widgets_map_[key]->POST(val);
+            if (amp == std::string::npos) break;
+            from = from + amp + 1;
         }
     }
     return this->get(env);
