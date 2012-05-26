@@ -1,9 +1,9 @@
 CC=clang++
 #CC=g++
-CFLAGS=-Wall -Wextra -pedantic
+CFLAGS=-Wall -Wextra -pedantic -ggdb
 COMPILE= $(CC) $(CFLAGS)
 
-all: app
+all: app skunk_test
 
 test: dispatcher_test
 
@@ -19,6 +19,12 @@ csgi.o: csgi.hpp csgi.cpp
 
 dispatcher.o: dispatcher.hpp dispatcher.cpp
 	$(COMPILE) -c dispatcher.cpp
+
+Skunk.o: Skunk.cpp Skunk.hpp csgi.hpp
+	$(COMPILE) -c Skunk.cpp
+
+skunk_test: skunk_test.cpp Skunk.o csgi.o
+	$(COMPILE) skunk_test.cpp Skunk.o csgi.o -o skunk_test
 
 clean:
 	rm -f *.o app dispatcher_test
