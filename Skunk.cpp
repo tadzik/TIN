@@ -158,8 +158,9 @@ CSGI::Response Skunk::Server::operator()(CSGI::Env& env) {
     }
     CSGI::Response resp = this->get(env);
     if (session.length() > 0)
-        resp.headers["Set-Cookie"] = "sessionid=" + session + "Max-Age="
-                                   + itoa(5*60); //FIXME: Minute is too low
+        resp.headers["Set-Cookie"] = "sessionid=" + session
+                                   + "; Max-Age=" + itoa(5*60);
+                                   //FIXME: Minute is too low
     return resp;
 }
 
