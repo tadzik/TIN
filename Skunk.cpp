@@ -114,7 +114,8 @@ CSGI::Response showLoginScreen() {
     resp.content.append("<form method='post' action='/'>");
 
     resp.content.append("User: <input name='user' type='text' /><br />");
-    resp.content.append("Pass: <input name='pass' type='text' /><br />");
+    resp.content.append("Pass: <input name='pass' type='password' />"
+                        "<br />");
 
     resp.content.append("<input type='submit' value='Zmień'/>");
     resp.content.append("</form>");
