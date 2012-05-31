@@ -135,7 +135,6 @@ CSGI::Response Skunk::Server::operator()(CSGI::Env& env) {
                 session.append("SkunkSession");
                 session.append(cred["user"]);
                 session.append(cred["pass"]);
-                std::cerr << "'" << session << "' is now established" << std::endl;
                 sessions_[session] = true;
             } else {
                 return showLoginScreen();
