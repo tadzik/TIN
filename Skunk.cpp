@@ -43,6 +43,9 @@ CSGI::Response Skunk::Server::get(CSGI::Env& env) {
 }
 
 CSGI::Response Skunk::Server::operator()(CSGI::Env& env) {
+//    if (!checkAuth(env)) {
+//        return this->loginScreen();
+//    }
     if (env["REQUEST_METHOD"].compare("POST") == 0) {
         std::string src = env["csgi.input"].c_str();
         std::string part, key, val;

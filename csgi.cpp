@@ -61,35 +61,67 @@ void CSGI::Server::run(bool async)
 
 void CSGI::Server::serve()
 {
-    struct sockaddr sa;
-    socklen_t       salen;
-    int             newfd;
+    int newfd;
 
     for (;;) {
-        newfd = accept(sockfd_, &sa, &salen);
+        SSL *ssl = SSL_new(ssl_ctx_);
+        newfd    = accept(sockfd_, 0, 0);
+        SSL_set_fd(ssl, newfd);
+        fprintf(stderr, "Calling ssl_accept\n");
+        int err = SSL_accept(ssl);
+        if (err != 1) {
+            fprintf(stderr, "Bad request\n");
+            std::string res;
+            res.append("HTTP/1.1 400 Bad Request\r\n\r\n");
+            res.append("SSL error: ");
+            res.append(ERR_error_string(SSL_get_error(ssl, err), 0));
+            res.append("\r\n");
+            fprintf(stderr, "'%s'\n", res.c_str());
+            write(newfd, res.c_str(), res.length());
+            close(newfd);
+            continue;
+        }
+        fprintf(stderr, "looks ok\n");
         CSGI::Env env;
         try {
-            env = parse_request(newfd);
+            fprintf(stderr, "parsing request\n");
+            env = parse_request(ssl);
+            fprintf(stderr, "parsed ok\n");
         } catch (CSGI::InvalidRequest&) {
-            const char *res = "400 Bad Request";
-            send(newfd, res, strlen(res), 0);
+            fprintf(stderr, "invalid request\n");
+            const char *res = "HTTP/1.1 400 Bad Request\n\nbad request";
+            SSL_write(ssl, res, strlen(res));
             close(newfd);
             continue;
         }
         Response resp = (*app_)(env);
-        send_response(resp, newfd);
+        send_response(resp, ssl);
         close(newfd);
+        SSL_free(ssl);
     }
 }
 
-CSGI::Env CSGI::Server::parse_request(int fd)
+CSGI::Env CSGI::Server::parse_request(SSL *ssl)
 {
     CSGI::Env env;
-    char buf[4096];
-    recv(fd, buf, sizeof(buf), 0);
-    
     std::stringstream s;
+    char buf[4096];
+    
+    int  ret = SSL_read(ssl, buf, sizeof(buf) - 1);
+    if (ret == -1) {
+        throw CSGI::InvalidRequest();
+    }
+    buf[ret] = '\0';
     s << std::string(buf);
+
+    if (ret < 5) { // dirty hack, I hope it's a temporary solution
+        ret = SSL_read(ssl, buf, sizeof(buf) - 1);
+        if (ret == -1) {
+            throw CSGI::InvalidRequest();
+        }
+        buf[ret] = '\0';
+        s << std::string(buf);
+    }
 
     std::string line;
     getline(s, line);
@@ -134,7 +166,7 @@ CSGI::Env CSGI::Server::parse_request(int fd)
     return env;
 }
 
-void CSGI::Server::send_response(Response& resp, int fd) {
+void CSGI::Server::send_response(Response& resp, SSL *ssl) {
     std::stringstream out;
     out << "HTTP/1.1 " << resp.status << " OK\r\n";
     Headers::iterator it;
@@ -145,5 +177,5 @@ void CSGI::Server::send_response(Response& resp, int fd) {
     }
     out << "\r\n";
     out << resp.content << "\r\n";
-    send(fd, out.str().c_str(), out.str().length(), 0);
+    SSL_write(ssl, out.str().c_str(), out.str().length());
 }

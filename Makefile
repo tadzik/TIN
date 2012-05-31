@@ -1,6 +1,6 @@
 CC=clang++
 #CC=g++
-CFLAGS=-Wall -Wextra -pedantic -ggdb
+CFLAGS=-Wall -Wextra -pedantic -ggdb -lssl
 COMPILE= $(CC) $(CFLAGS)
 
 all: app skunk_test
