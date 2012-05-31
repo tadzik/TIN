@@ -43,7 +43,7 @@ struct TextField : Widget {
         html.append(id_str.str());
         html.append("' value='");
         html.append(this->getValue());
-        html.append("'></input>");
+        html.append("'/>\n");
 
         return html;
     }

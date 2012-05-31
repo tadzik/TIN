@@ -53,7 +53,10 @@ CSGI::Response Skunk::Server::get(CSGI::Env& env) {
     resp.status = 200;
     std::vector<Skunk::Widget *>::iterator it;
 
-    resp.content.append("<form method='post' action='/'>");
+    resp.content.append("<!DOCTYPE html>\n<html>\n");
+    resp.content.append("\t<head><title>2012 TIN MF</title></head>\n");
+    resp.content.append("\t<body>");
+    resp.content.append("\n\t\t<form method='post' action='/'>\n");
 
     for (it = widgets_.begin(); it != widgets_.end(); it++) {
         Skunk::Widget *w = *it;
@@ -61,8 +64,9 @@ CSGI::Response Skunk::Server::get(CSGI::Env& env) {
         resp.content.append("<hr/>");
     }
 
-    resp.content.append("<input type='submit' value='Zmień'/>");
-    resp.content.append("</form>");
+    resp.content.append("\n\t\t\t<input type='submit' value='Zmień'/>");
+    resp.content.append("\n\t\t</form>");
+    resp.content.append("\n\t</body>\n</html>\n");
 
     resp.headers["Content-Type"]   = "text/html";
     resp.headers["Content-Length"] = itoa(resp.content.length());
