@@ -31,6 +31,7 @@ int main(void) {
 
     Skunk::SimpleAuth *auth = new Skunk::SimpleAuth();
     auth->addUser("admin", "dupa.8");
+    auth->addUser("user",  "dupa.8");
 
     srv->setAuth(auth);
 
