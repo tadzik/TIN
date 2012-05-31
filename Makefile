@@ -27,9 +27,10 @@ skunk_test: skunk_test.cpp Skunk.o csgi.o
 	$(COMPILE) skunk_test.cpp Skunk.o csgi.o $(LDFLAGS) -o skunk_test
 
 test: skunk_test Selenium_test.py
+	killall -q skunk_test || true
 	./skunk_test &
-	sst-run -r html -s Selenium_test
-	killall skunk_test
+	sst-run -r html -s -d ./
+	killall -q skunk_test || true
 
 clean:
 	rm -f *.o app dispatcher_test
