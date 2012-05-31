@@ -27,7 +27,6 @@ std::string urldecoder(std::string coded){
     {
     Text.replace(Pos, 1, 1, ' ');} 
 
-    std::cout << Text << std::endl;
     return Text;
 }
 
@@ -134,7 +133,7 @@ CSGI::Response Skunk::Server::operator()(CSGI::Env& env) {
             if (auth_->verify(cred["user"], cred["pass"])) {
                 session.append("SkunkSession");
                 session.append(cred["user"]);
-                session.append(cred["pass"]);
+                session.append(itoa(rand()));
                 sessions_[session] = true;
             } else {
                 return showLoginScreen();
@@ -155,7 +154,8 @@ CSGI::Response Skunk::Server::operator()(CSGI::Env& env) {
     }
     CSGI::Response resp = this->get(env);
     if (session.length() > 0)
-        resp.headers["Set-Cookie"] = "sessionid=" + session;
+        resp.headers["Set-Cookie"] = "sessionid=" + session + "Max-Age="
+                                   + itoa(60); //FIXME: Minute is too low
     return resp;
 }
 
