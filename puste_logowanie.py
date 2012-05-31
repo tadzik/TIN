@@ -12,5 +12,7 @@ def testuj_puste_logowanie():
     #write_textfield(passw,'')
     submit = get_element(tag='input', type='submit')
     click_element(submit)
+    sleep(3)
+    go_to(base_url)
 
 testuj_puste_logowanie()
