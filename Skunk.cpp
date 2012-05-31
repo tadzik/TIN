@@ -15,7 +15,6 @@ return char(Z); // cast to char and return
 
 std::string urldecoder(std::string coded){
     std::string Text = coded;
-    //std::string Text (Luthien[1]);
     std::string::size_type Pos;
     std::string Hex;
     while (std::string::npos != (Pos = Text.find('%')))
@@ -156,7 +155,7 @@ CSGI::Response Skunk::Server::operator()(CSGI::Env& env) {
     CSGI::Response resp = this->get(env);
     if (session.length() > 0)
         resp.headers["Set-Cookie"] = "sessionid=" + session + "Max-Age="
-                                   + itoa(60); //FIXME: Minute is too low
+                                   + itoa(5*60); //FIXME: Minute is too low
     return resp;
 }
 
