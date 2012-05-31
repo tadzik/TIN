@@ -31,12 +31,6 @@ std::string urldecoder(std::string coded){
 
 typedef std::map<std::string, std::string> StringMap;
 
-std::string itoa(int i) {
-    std::stringstream str;
-    str << i;
-    return str.str();
-}
-
 int Skunk::Server::addWidget(Skunk::Widget *w) {
     widgets_.push_back(w);
     w->id_ = nextID_;

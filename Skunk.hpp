@@ -6,6 +6,12 @@
 
 #include "csgi.hpp"
 
+static std::string itoa(int i) {
+    std::stringstream str;
+    str << i;
+    return str.str();
+}
+
 namespace Skunk {
 
 struct Widget {
@@ -64,6 +70,65 @@ struct TextField : Widget {
 
     virtual void POST(std::string& s) {
         this->setValue(s);
+    }
+};
+
+struct RadioButton : Widget {
+    std::vector<std::string> listaWyboru;
+    int index;
+    std::string title;
+
+    RadioButton() : title("Ratio Button:") { }
+
+    virtual void setValue(int) { };
+
+    virtual bool isDefault(int i){
+        if(i == index) return true;
+        else return false;
+    }
+
+    virtual int getElemsNum(){
+        return listaWyboru.size();
+    }
+
+    virtual std::string getValue() {
+        return listaWyboru[index];
+    }
+
+    virtual std::string getValue(int indx) {
+        return listaWyboru[indx];
+    }
+
+    virtual void addChoice(std::string choice){
+        listaWyboru.push_back(choice);
+    }
+
+    virtual void setTitle(std::string title_){
+        title = title_;
+    }
+
+    virtual std::string GET() {
+        std::stringstream id_str;
+        id_str << this ->id_;
+        std::string html = "";
+        html.append("<b>"+ title +"</b><br />\n");
+        for(int i=0; i<this->getElemsNum(); i++){
+            html.append("<input type='radio' name='");
+            html.append("id"+id_str.str());
+            html.append("'");
+            html.append(" value='");
+            html.append(""+ itoa(i));
+            html.append("' ");
+            if(this->isDefault(i)) html.append("checked ");
+            html.append("/>");
+            html.append(this->getValue(i));
+            html.append("<br />\n");
+        }
+        return html;
+    }
+
+    virtual void POST(std::string& s) {
+        this->setValue(atoi(s.c_str()));
     }
 };
 

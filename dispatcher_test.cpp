@@ -3,13 +3,6 @@
 #include <sstream>
 #include <iostream>
 
-std::string itoa(int i)
-{
-    std::stringstream out;
-    out << i;
-    return out.str();
-}
-
 class SimpleResponder : public CSGI::Application {
 public:
     SimpleResponder(std::string msg) : msg_(msg) { }
