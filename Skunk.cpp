@@ -192,7 +192,7 @@ CSGI::Response Skunk::Server::operator()(CSGI::Env& env) {
                 session.append("SkunkSession");
                 session.append(cred["user"]);
                 session.append(itoa(rand()));
-                sessions_[session] = cred["user"];
+                username = sessions_[session] = cred["user"];
             } else {
                 return showLoginScreen();
             }
