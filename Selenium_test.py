@@ -28,9 +28,13 @@ def testuj_czy_get():
     submit = get_element(tag='input', type='submit')
     click_element(submit)
     sleep(3)
-    go_to(base_url)
+    go_to(base_url)         #get ?
+    if assert_element(tag='input', name='id2'):
+        ok=True
     sleep(3)
     go_to(base_url)
+    sleep(3)
+    print ok
    
 zaloguj()   
 testuj_czy_get()
