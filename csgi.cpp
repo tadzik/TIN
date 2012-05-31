@@ -144,6 +144,8 @@ CSGI::Env CSGI::Server::parse_request(SSL *ssl)
             env["HTTP_PORT"] = v.substr(pos + 1);
             continue;
         }
+        // remove trailing \r
+        v.erase(v.length() - 1);
         env[k] = v;
     }
 

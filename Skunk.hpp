@@ -63,6 +63,7 @@ public:
     Server() : nextID_(0) { };
     void addWidget(Widget *);
     void setAuth(Auth *a) { auth_ = a; }
+    bool isAuthed(CSGI::Env&);
     void run();
     CSGI::Response get(CSGI::Env&);
     virtual CSGI::Response operator()(CSGI::Env&);
