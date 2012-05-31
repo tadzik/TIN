@@ -8,7 +8,7 @@ def testuj_puste_logowanie():
     user = get_element(tag='input', name='user')
     passw = get_element(tag='input', name='pass')
     
-    write_textfield(user,'admin')
+    write_textfield(user,'admin', check=False)
     #write_textfield(passw,'')
     submit = get_element(tag='input', type='submit')
     click_element(submit)

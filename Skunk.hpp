@@ -77,7 +77,7 @@ public:
     Server() : nextID_(0) { };
     int addWidget(Widget *);
     void setAuth(Auth *a) { auth_ = a; }
-    bool isAuthed(CSGI::Env&);
+    std::string isAuthed(CSGI::Env&);
     void run();
     CSGI::Response get(CSGI::Env&);
     virtual CSGI::Response operator()(CSGI::Env&);

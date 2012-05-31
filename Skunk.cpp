@@ -58,10 +58,13 @@ CSGI::Response Skunk::Server::get(CSGI::Env& env) {
     resp.content.append("\t<body>");
     resp.content.append("\n\t\t<form method='post' action='/'>\n");
 
+    std::string username = isAuthed(env);
     for (it = widgets_.begin(); it != widgets_.end(); it++) {
         Skunk::Widget *w = *it;
-        resp.content.append(w->GET());
-        resp.content.append("<hr/>");
+        if (auth_->canGET(username, w->id_)) {
+            resp.content.append(w->GET());
+            resp.content.append("<hr/>");
+        }
     }
 
     resp.content.append("\n\t\t\t<input type='submit' value='Zmień'/>");
@@ -101,12 +104,9 @@ StringMap parseCookies(std::string& src) {
     return parseKeyVals(src, ";");
 }
 
-bool Skunk::Server::isAuthed(CSGI::Env& env) {
+std::string Skunk::Server::isAuthed(CSGI::Env& env) {
     StringMap cookies = parseCookies(env["HTTP_COOKIE"]);
-    if (sessions_[cookies["sessionid"]].compare("") != 0) {
-        return true;
-    }
-    return false;
+    return sessions_[cookies["sessionid"]];
 }
 
 CSGI::Response showLoginScreen() {
@@ -130,8 +130,9 @@ CSGI::Response showLoginScreen() {
 }
 
 CSGI::Response Skunk::Server::operator()(CSGI::Env& env) {
-    std::string session = "";
-    if (!isAuthed(env)) {
+    std::string session  = "";
+    std::string username = isAuthed(env);
+    if (username.compare("") == 0) {
         if (env["REQUEST_METHOD"].compare("POST") == 0) {
             StringMap cred = parsePostData(env);
             if (auth_->verify(cred["user"], cred["pass"])) {
@@ -150,9 +151,12 @@ CSGI::Response Skunk::Server::operator()(CSGI::Env& env) {
         StringMap data  = parsePostData(env);
         StringMap::iterator it;
         for (it = data.begin(); it != data.end(); it++) {
-            if (widgets_map_[it->first] != NULL) {
-                std::string decoded = urldecoder(it->second);
-                widgets_map_[it->first]->POST(decoded);
+            Widget *w = widgets_map_[it->first];
+            if (w != NULL) {
+                if (auth_->canPOST(username, w->id_)) {
+                    std::string decoded = urldecoder(it->second);
+                    w->POST(decoded);
+                }
             }
         }
     }
