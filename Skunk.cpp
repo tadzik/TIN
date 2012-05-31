@@ -37,6 +37,8 @@ std::string urldecoder(std::string coded){
 
 
 
+typedef std::map<std::string, std::string> StringMap;
+
 std::string itoa(int i) {
     std::stringstream str;
     str << i;
@@ -77,23 +79,34 @@ CSGI::Response Skunk::Server::get(CSGI::Env& env) {
     (void)env;
 }
 
+StringMap parsePostData(std::string& src) {
+    StringMap ret;
+    std::string part, key, val;
+    size_t from = 0, amp, eq;
+
+    for (;;) {
+        amp      = src.substr(from).find("&");
+        part     = src.substr(from, amp);
+        eq       = part.find("=");
+        key      = part.substr(0, eq);
+        val      = part.substr(eq + 1);
+        ret[key] = val;
+        if (amp == std::string::npos) break;
+        from = from + amp + 1;
+    }
+    return ret;
+}
+
 CSGI::Response Skunk::Server::operator()(CSGI::Env& env) {
     if (env["REQUEST_METHOD"].compare("POST") == 0) {
         std::string src = env["csgi.input"].c_str();
-        std::string part, key, val;
-        size_t from = 0, amp, eq;
-
-        for (;;) {
-            amp  = src.substr(from).find("&");
-            part = src.substr(from, amp);
-            eq   = part.find("=");
-            key  = part.substr(0, eq);
-            val  = urldecoder(part.substr(eq + 1));
-            
-            
-            widgets_map_[key]->POST(val); ///funkcja url encode
-            if (amp == std::string::npos) break;
-            from = from + amp + 1;
+        StringMap data  = parsePostData(src);
+        StringMap::iterator it;
+        for (it = data.begin(); it != data.end(); it++) {
+            if (widgets_map_[it->first] != NULL) {
+                std::string decoded = urldecoder(it->second);
+                widgets_map_[it->first]->POST(decoded);
+            }
         }
     }
     return this->get(env);
