@@ -37,14 +37,14 @@ std::string itoa(int i) {
     return str.str();
 }
 
-void Skunk::Server::addWidget(Skunk::Widget *w) {
+int Skunk::Server::addWidget(Skunk::Widget *w) {
     widgets_.push_back(w);
     w->id_ = nextID_;
 
     std::string id = "id" + itoa(nextID_);
     widgets_map_[id] = w;
 
-    nextID_++;
+    return nextID_++;
 }
 
 CSGI::Response Skunk::Server::get(CSGI::Env& env) {
@@ -103,7 +103,7 @@ StringMap parseCookies(std::string& src) {
 
 bool Skunk::Server::isAuthed(CSGI::Env& env) {
     StringMap cookies = parseCookies(env["HTTP_COOKIE"]);
-    if (sessions_[cookies["sessionid"]]) {
+    if (sessions_[cookies["sessionid"]].compare("") != 0) {
         return true;
     }
     return false;
@@ -138,7 +138,7 @@ CSGI::Response Skunk::Server::operator()(CSGI::Env& env) {
                 session.append("SkunkSession");
                 session.append(cred["user"]);
                 session.append(itoa(rand()));
-                sessions_[session] = true;
+                sessions_[session] = cred["user"];
             } else {
                 return showLoginScreen();
             }

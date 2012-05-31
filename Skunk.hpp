@@ -16,6 +16,8 @@ struct Widget {
 
 struct Auth {
     virtual bool verify(std::string&, std::string&) = 0;
+    virtual bool canGET(std::string&,  int)         = 0;
+    virtual bool canPOST(std::string&, int)         = 0;
 };
 
 struct SimpleAuth : Auth {
@@ -29,6 +31,16 @@ struct SimpleAuth : Auth {
 
     void addUser(std::string user, std::string pass) {
         users_[user] = pass;
+    }
+
+    virtual bool canGET(std::string& user, int id) {
+        return true;
+        (void)user; (void)id;
+    }
+
+    virtual bool canPOST(std::string& user, int id) {
+        return user.compare("admin") == 0;
+        (void)id;
     }
 };
 
@@ -57,13 +69,13 @@ struct TextField : Widget {
 
 class Server : CSGI::Application {
     std::vector<Widget *> widgets_;
-    std::map<std::string, Widget*> widgets_map_;
-    std::map<std::string, bool>    sessions_;
+    std::map<std::string, Widget*>     widgets_map_;
+    std::map<std::string, std::string> sessions_;
     Auth * auth_;
     int nextID_;
 public:
     Server() : nextID_(0) { };
-    void addWidget(Widget *);
+    int addWidget(Widget *);
     void setAuth(Auth *a) { auth_ = a; }
     bool isAuthed(CSGI::Env&);
     void run();
