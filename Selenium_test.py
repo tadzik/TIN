@@ -17,6 +17,17 @@ def zaloguj():
     click_element(submit)
     
     
+def testuj_puste_logowanie():
+    go_to(base_url)
+    sleep(3)
+    user = get_element(tag='input', name='user')
+    passw = get_element(tag='input', name='pass')
+    
+    write_textfield(user,'admin')
+    write_textfield(passw,'dupa.8')
+    submit = get_element(tag='input', type='submit')
+    click_element(submit)
+    
 def testuj_czy_get():
 
     text1 = get_element(tag='input', name='id1')
