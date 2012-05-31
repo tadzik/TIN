@@ -1,5 +1,4 @@
-CC=clang++
-#CC=g++
+CC?=clang++
 CFLAGS=-Wall -Wextra -pedantic -ggdb
 LDFLAGS=-lssl -lcrypto
 COMPILE= $(CC) $(CFLAGS)
