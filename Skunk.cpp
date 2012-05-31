@@ -66,9 +66,13 @@ CSGI::Response Skunk::Server::get(CSGI::Env& env) {
             resp.content.append("<hr/>");
         }
     }
-
+    std::cout << username <<std::endl;
     resp.content.append("\n\t\t\t<input type='submit' value='Zmień'/>");
     resp.content.append("\n\t\t</form>");
+    if(username == "admin"){
+        resp.content.append("\n\n\n<a href='/adduser'>Add new user</a>");
+    }
+    
     resp.content.append("\n\t</body>\n</html>\n");
 
     resp.headers["Content-Type"]   = "text/html";
@@ -113,21 +117,60 @@ CSGI::Response showLoginScreen() {
     CSGI::Response resp;
 
     resp.status = 200;
-
+    ///wyglad strony
+    resp.content.append("<!DOCTYPE html>\n<html>\n");
+    resp.content.append("\t<head><title>2012 SKUNKS LOGIN</title></head>\n");
+    resp.content.append("\t<body>");
+    
+    
+    
+    
     resp.content.append("<form method='post' action='/'>");
 
-    resp.content.append("User: <input name='user' type='text' /><br />");
-    resp.content.append("Pass: <input name='pass' type='password' />"
+    resp.content.append("<p style='position:absolute; left:0px; top:0px;'> Username: <input name='user' type='text'/></p><br />");
+    resp.content.append("<p style='position:absolute; left:300px;top:0px;'> Password: <input name='pass' type='password' /></p>"
                         "<br />");
 
-    resp.content.append("<input type='submit' value='Zmień'/>");
+    resp.content.append("<input style='postition:absolute; left:0px; top:50px;' type='submit' value='Zaloguj'/>");
     resp.content.append("</form>");
-
+    resp.content.append("\n\t</body>\n</html>\n");
     resp.headers["Content-Type"]   = "text/html";
     resp.headers["Content-Length"] = itoa(resp.content.length());
+    
+    
+    
 
     return resp;
 }
+
+
+CSGI::Response addNewUser(){
+    
+    CSGI::Response resp;
+    resp.status = 200;
+    
+    resp.content.append("<!DOCTYPE html>\n<html>\n");
+    resp.content.append("\t<head><title>2012 SKUNKS LOGIN</title></head>\n");
+    resp.content.append("\t<body>");
+    
+    resp.content.append("<form method='post' action='/adduser'>");
+    
+    resp.content.append("<p style='position:absolute; left:0px; top:0px;'> New username: <input name='user' type='text'/></p><br />");
+    resp.content.append("<p style='position:absolute; left:300px;top:0px;'> Password: <input name='pass' type='text' /></p>"
+                        "<br />");
+
+    resp.content.append("<input style='postition:absolute; left:0px; top:50px;' type='submit' value='Utworz nowego usera'/>");
+    
+    
+    resp.content.append("</form>");
+    
+    resp.content.append("\n\t</body>\n</html>\n");
+    resp.headers["Content-Type"]   = "text/html";
+    resp.headers["Content-Length"] = itoa(resp.content.length());
+    return resp;
+}
+
+
 
 CSGI::Response Skunk::Server::operator()(CSGI::Env& env) {
     std::string session  = "";
@@ -160,11 +203,23 @@ CSGI::Response Skunk::Server::operator()(CSGI::Env& env) {
             }
         }
     }
+    
+    if ((env["REQUEST_URI"].compare("/adduser") == 0)&&(username=="admin")){
+        if (env["REQUEST_METHOD"].compare("POST") == 0) {
+            StringMap cred = parsePostData(env);
+            auth_->addUser(cred["user"],cred["pass"]);
+        }
+        else{
+        return addNewUser();
+        }
+    }
+    
     CSGI::Response resp = this->get(env);
     if (session.length() > 0)
         resp.headers["Set-Cookie"] = "sessionid=" + session
                                    + "; Max-Age=" + itoa(5*60);
                                    //FIXME: Minute is too low
+    
     return resp;
 }
 
