@@ -66,7 +66,11 @@ CSGI::Response Skunk::Server::get(CSGI::Env& env) {
     if(username == "admin"){
         resp.content.append("\n\n\n<a href='/adduser'>Add new user</a>");
     }
-    
+
+    resp.content.append("<form method='post' action='/logout'>");
+    resp.content.append("<input type='submit' value='Logout'/>");
+    resp.content.append("</form>");
+
     resp.content.append("\n\t</body>\n</html>\n");
 
     resp.headers["Content-Type"]   = "text/html";
@@ -105,6 +109,11 @@ StringMap parseCookies(std::string& src) {
 std::string Skunk::Server::isAuthed(CSGI::Env& env) {
     StringMap cookies = parseCookies(env["HTTP_COOKIE"]);
     return sessions_[cookies["sessionid"]];
+}
+
+void Skunk::Server::removeSession(CSGI::Env& env) {
+    StringMap cookies = parseCookies(env["HTTP_COOKIE"]);
+    sessions_[cookies["sessionid"]] = "";
 }
 
 CSGI::Response showLoginScreen() {
@@ -146,9 +155,9 @@ CSGI::Response addNewUser(){
     resp.content.append("<!DOCTYPE html>\n<html>\n");
     resp.content.append("\t<head><title>2012 SKUNKS LOGIN</title></head>\n");
     resp.content.append("\t<body>");
-    
+
     resp.content.append("<form method='post' action='/adduser'>");
-    
+
     resp.content.append("<p style='position:absolute; left:0px; top:0px;'> New username: <input name='user' type='text'/></p><br />");
     resp.content.append("<p style='position:absolute; left:300px;top:0px;'> Password: <input name='pass' type='text' /></p>"
                         "<br />");
@@ -157,6 +166,7 @@ CSGI::Response addNewUser(){
     
     
     resp.content.append("</form>");
+
     
     resp.content.append("\n\t</body>\n</html>\n");
     resp.headers["Content-Type"]   = "text/html";
@@ -169,6 +179,12 @@ CSGI::Response addNewUser(){
 CSGI::Response Skunk::Server::operator()(CSGI::Env& env) {
     std::string session  = "";
     std::string username = isAuthed(env);
+
+    if (env["REQUEST_URI"].compare("/logout") == 0) {
+        removeSession(env);
+        return showLoginScreen();
+    }
+
     if (username.compare("") == 0) {
         if (env["REQUEST_METHOD"].compare("POST") == 0) {
             StringMap cred = parsePostData(env);
