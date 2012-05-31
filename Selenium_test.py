@@ -32,9 +32,9 @@ def testuj_czy_get():
 
     text1 = get_element(tag='input', name='id1')
     text2 = get_element(tag='input', name='id2')
-    write_textfield(text1,u'ksztaltna dupa') 
+    write_textfield(text1,u'ksztaltna dupa', check=False)
     sleep(3)
-    write_textfield(text2,u'ksztaltne cycki')
+    write_textfield(text2,u'ksztaltne cycki', check=False)
     sleep(3)
     submit = get_element(tag='input', type='submit')
     click_element(submit)
