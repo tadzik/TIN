@@ -1,6 +1,41 @@
 #include "Skunk.hpp"
 #include <cstdio>
 #include <cstring>
+#include <iostream>
+
+
+char CharFromHex (std::string a)
+{
+std::istringstream Blat (a);
+int Z;
+Blat >> std::hex >> Z;
+
+return char(Z); // cast to char and return
+}
+
+std::string urldecoder(std::string coded){
+    std::string Text = coded;
+    //std::string Text (Luthien[1]);
+    std::string::size_type Pos;
+    std::string Hex;
+    while (std::string::npos != (Pos = Text.find('%')))
+    {
+    Hex = Text.substr(Pos + 1, 2);
+    Text.replace(Pos, 3, 1, CharFromHex(Hex));} 
+
+    while (std::string::npos != (Pos = Text.find('+')))
+    {
+    Text.replace(Pos, 1, 1, ' ');} 
+
+    std::cout << Text << std::endl;
+    return Text;
+}
+
+
+
+
+
+
 
 std::string itoa(int i) {
     std::stringstream str;
@@ -43,9 +78,6 @@ CSGI::Response Skunk::Server::get(CSGI::Env& env) {
 }
 
 CSGI::Response Skunk::Server::operator()(CSGI::Env& env) {
-//    if (!checkAuth(env)) {
-//        return this->loginScreen();
-//    }
     if (env["REQUEST_METHOD"].compare("POST") == 0) {
         std::string src = env["csgi.input"].c_str();
         std::string part, key, val;
@@ -56,8 +88,10 @@ CSGI::Response Skunk::Server::operator()(CSGI::Env& env) {
             part = src.substr(from, amp);
             eq   = part.find("=");
             key  = part.substr(0, eq);
-            val  = part.substr(eq + 1);
-            widgets_map_[key]->POST(val);
+            val  = urldecoder(part.substr(eq + 1));
+            
+            
+            widgets_map_[key]->POST(val); ///funkcja url encode
             if (amp == std::string::npos) break;
             from = from + amp + 1;
         }
