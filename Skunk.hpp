@@ -18,6 +18,7 @@ struct Auth {
     virtual bool verify(std::string&, std::string&) = 0;
     virtual bool canGET(std::string&,  int)         = 0;
     virtual bool canPOST(std::string&, int)         = 0;
+    virtual void addUser(std::string , std::string ) = 0;
 };
 
 struct SimpleAuth : Auth {
