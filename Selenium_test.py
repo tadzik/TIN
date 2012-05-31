@@ -38,9 +38,9 @@ def testuj_czy_get():
     sleep(3)
     submit = get_element(tag='input', type='submit')
     click_element(submit)
-    sleep(10)
+    sleep(3)
     go_to(base_url)
-    sleep(10)
+    sleep(3)
     go_to(base_url)
    
 zaloguj()   
