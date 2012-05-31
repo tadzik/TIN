@@ -22,6 +22,7 @@ struct SimpleAuth : Auth {
     std::map<std::string, std::string> users_;
 
     virtual bool verify(std::string& user, std::string& pass) {
+        if (user.length() == 0) return false;
         return users_[user].compare(pass) == 0;
     }
 
