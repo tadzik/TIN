@@ -67,29 +67,22 @@ void CSGI::Server::serve()
         SSL *ssl = SSL_new(ssl_ctx_);
         newfd    = accept(sockfd_, 0, 0);
         SSL_set_fd(ssl, newfd);
-        fprintf(stderr, "Calling ssl_accept\n");
         int err = SSL_accept(ssl);
         if (err != 1) {
-            fprintf(stderr, "Bad request\n");
             std::string res;
             res.append("HTTP/1.1 400 Bad Request\r\n\r\n");
             res.append("SSL error: ");
             res.append(ERR_error_string(SSL_get_error(ssl, err), 0));
             res.append("\r\n");
-            fprintf(stderr, "'%s'\n", res.c_str());
             write(newfd, res.c_str(), res.length());
             close(newfd);
             continue;
         }
-        fprintf(stderr, "looks ok\n");
         CSGI::Env env;
         try {
-            fprintf(stderr, "parsing request\n");
             env = parse_request(ssl);
-            fprintf(stderr, "parsed ok\n");
         } catch (CSGI::InvalidRequest&) {
-            fprintf(stderr, "invalid request\n");
-            const char *res = "HTTP/1.1 400 Bad Request\n\nbad request";
+            const char *res = "HTTP/1.1 400 Bad Request\r\n\r\nbad request";
             SSL_write(ssl, res, strlen(res));
             close(newfd);
             continue;
