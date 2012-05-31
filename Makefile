@@ -1,7 +1,7 @@
-CC?=clang++
+CXX?=clang++
 CFLAGS=-Wall -Wextra -pedantic -ggdb
 LDFLAGS=-lssl -lcrypto
-COMPILE= $(CC) $(CFLAGS)
+COMPILE= $(CXX) $(CFLAGS)
 
 all: app skunk_test
 
