@@ -3,7 +3,17 @@
 #include <cstring>
 #include <iostream>
 
-
+/**
+ * @file Skunk.cpp
+ * 
+ * */
+ 
+ 
+ /**
+  * Przekazuje znak zapisany heksadecymalnie do typu char
+  * @param a - podawany na wejscie string z heksadecymalnym znakiem
+  * 
+  * */
 char CharFromHex (std::string a)
 {
 std::istringstream Blat (a);
@@ -13,6 +23,14 @@ Blat >> std::hex >> Z;
 return char(Z); // cast to char and return
 }
 
+
+/**
+ * Odczytuje strumien z pola tekstowego formularza widocznego w przegladarce
+ * i konwertuje go na typ string
+ * 
+ * @param coded - parametr typu string odczytywany z pola tekstowego
+ * @return Text - zwraca przekonwertowany string
+ * */
 std::string urldecoder(std::string coded){
     std::string Text = coded;
     std::string::size_type Pos;
@@ -29,8 +47,15 @@ std::string urldecoder(std::string coded){
     return Text;
 }
 
+
 typedef std::map<std::string, std::string> StringMap;
 
+
+/**
+ * Dodaje nowy widget do serwera
+ * @param w - nowy widget 
+ * @return zwraca wskaznik na puste miejsce w liscie widgetow
+ * */
 int Skunk::Server::addWidget(Skunk::Widget *w) {
     widgets_.push_back(w);
     w->id_ = nextID_;
@@ -41,6 +66,13 @@ int Skunk::Server::addWidget(Skunk::Widget *w) {
     return nextID_++;
 }
 
+
+/**
+ * Realizuje metode HTTP GET przy wiswietlaniu wszystkich dostepnych widgetow
+ * @param env - parametry zapytania HTTP
+ * @return zwraca odpowiedz serwera
+ * 
+ * */
 CSGI::Response Skunk::Server::get(CSGI::Env& env) {
     CSGI::Response resp;
 
@@ -48,7 +80,7 @@ CSGI::Response Skunk::Server::get(CSGI::Env& env) {
     std::vector<Skunk::Widget *>::iterator it;
 
     resp.content.append("<!DOCTYPE html>\n<html>\n");
-    resp.content.append("\t<head><title>2012 TIN MF</title></head>\n");
+    resp.content.append("\t<head><title>2012 TIN SERVER</title></head>\n");
     resp.content.append("\t<body>");
     resp.content.append("\n\t\t<form method='post' action='/'>\n");
 
@@ -80,6 +112,15 @@ CSGI::Response Skunk::Server::get(CSGI::Env& env) {
     (void)env;
 }
 
+
+/**
+ * Parser wartosci kluczowych,uzywany do izolowania odpowiednich
+ * wartosci z parametrow zapytania HTTP
+ * @param src - string do parsowania
+ * @param separator - zadany do parsowania separator, zwykle &
+ * @return - zwraca sparsowana wartosc kluczowa
+ * 
+ * */
 StringMap parseKeyVals(std::string& src, std::string separator) {
     StringMap ret;
     std::string part, key, val;
@@ -98,24 +139,54 @@ StringMap parseKeyVals(std::string& src, std::string separator) {
     return ret;
 }
 
+
+/**
+ * Parser danych metody POST
+ * @param env - parametry zapytania HTTP
+ * @return sparsowane dane POST
+ * */
 StringMap parsePostData(CSGI::Env& env) {
     return parseKeyVals(env["csgi.input"], "&");
 }
 
+
+/**
+ * Parser ciasteczek
+ * @param src - string zrodlowy
+ * @return - sparsowane ciasteczko (separator: ;)
+ * */
 StringMap parseCookies(std::string& src) {
     return parseKeyVals(src, ";");
 }
 
+
+/**
+ * Sprawdza autoryzacje uzytkownika poprzez parsowanie parametrów zapytania HTTP
+ * @param env - parametry zapytania HTTP
+ * @return identyfikator uzytkownika sesji
+ * */
 std::string Skunk::Server::isAuthed(CSGI::Env& env) {
     StringMap cookies = parseCookies(env["HTTP_COOKIE"]);
     return sessions_[cookies["sessionid"]];
 }
 
+
+/**
+ * Usuwa z ciasteczek biezaca sesje
+ * @param env - parametry zapytania HTTP
+ * 
+ * */
 void Skunk::Server::removeSession(CSGI::Env& env) {
     StringMap cookies = parseCookies(env["HTTP_COOKIE"]);
     sessions_[cookies["sessionid"]] = "";
 }
 
+
+/**
+ * Wyswietla strone logowania
+ * @return odpowiedz HTTP
+ * 
+ * */
 CSGI::Response showLoginScreen() {
     CSGI::Response resp;
 
@@ -124,10 +195,7 @@ CSGI::Response showLoginScreen() {
     resp.content.append("<!DOCTYPE html>\n<html>\n");
     resp.content.append("\t<head><title>2012 SKUNKS LOGIN</title></head>\n");
     resp.content.append("\t<body>");
-    
-    
-    
-    
+
     resp.content.append("<form method='post' action='/'>");
 
     resp.content.append("<p style='position:absolute; left:0px; top:0px;'> Username: <input name='user' type='text'/></p><br />");
@@ -139,21 +207,21 @@ CSGI::Response showLoginScreen() {
     resp.content.append("\n\t</body>\n</html>\n");
     resp.headers["Content-Type"]   = "text/html";
     resp.headers["Content-Length"] = itoa(resp.content.length());
-    
-    
-    
-
     return resp;
 }
 
 
+/**
+ * Wyswietla ekran dodawania nowego uzytkownika w panelu admina
+ * @return odpowiedz HTTP
+ * */
 CSGI::Response addNewUser(){
     
     CSGI::Response resp;
     resp.status = 200;
     
     resp.content.append("<!DOCTYPE html>\n<html>\n");
-    resp.content.append("\t<head><title>2012 SKUNKS LOGIN</title></head>\n");
+    resp.content.append("\t<head><title>2012 SKUNKS ADD NEW USER</title></head>\n");
     resp.content.append("\t<body>");
 
     resp.content.append("<form method='post' action='/adduser'>");
@@ -175,7 +243,13 @@ CSGI::Response addNewUser(){
 }
 
 
-
+/**
+ * Sprawdza URI oraz typ metody HTTP i przydziela odpowiednie widoki 
+ * w zaleznosci od potrzeb
+ * URI - dalsza czesc adresu url
+ * @param env - parametry zapytania HTTP
+ * 
+ * */
 CSGI::Response Skunk::Server::operator()(CSGI::Env& env) {
     std::string session  = "";
     std::string username = isAuthed(env);
@@ -233,6 +307,10 @@ CSGI::Response Skunk::Server::operator()(CSGI::Env& env) {
     return resp;
 }
 
+
+/**
+ * Uruchamia server CSGI
+ * */
 void Skunk::Server::run() {
     CSGI::Server srv(this, 8080);
     srv.run(false);
