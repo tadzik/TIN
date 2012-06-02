@@ -17,6 +17,10 @@
 #include <openssl/ssl.h>
 #include <openssl/err.h>
 
+/**
+ * @file csgi.hpp
+ */
+
 namespace CSGI {
 
 typedef std::map<std::string, std::string> _stringmap;
@@ -34,12 +38,21 @@ struct Response {
     Body    content;
 };
 
+/**
+ * Aplikacja CSGI
+ *
+ * Aplikacja CSGI to obiekt funkcyjny przyjmujący mapę CSGI::Env
+ * oraz zwracający instancję CSGI::Response
+ */
 class Application {
 public:
     virtual CSGI::Response operator()(CSGI::Env&) = 0;
     virtual ~Application() { }
 };
 
+/**
+ * Podstawowa klasa do wyjątków rzucanych przez serwer CSGI
+ */
 class Exception : public std::exception {
 public:
     Exception(std::string msg) : message_(msg) { }
@@ -53,10 +66,23 @@ private:
     std::string message_;
 };
 
+/**
+ * Wyjątek rzucany przy niepoprawnym zapytaniu HTTP;
+ * do użytku wewnętrnego
+ */
 class InvalidRequest : public std::exception { };
 
+/**
+ * Serwer CSGI, serwujący wybraną aplikację
+ */
 class Server {
 public:
+    /**
+     * Konstruktor serwera
+     *
+     * @param app  aplikacja którą serwer ma serwować
+     * @param port port na którym serwer będzie nasłuchiwać
+     */
     Server(Application * app, int port) : app_(app), port_(port)
     {
         backlog_ = 10;
@@ -83,8 +109,14 @@ public:
         ssl_ = SSL_new(ssl_ctx_);
     }
 
+    /**
+     * Uruchomienie serwera
+     *
+     * @param async czy uruchomić serwer w osobnym procesie
+     *              jeśli nie, wywołanie jest blokujące
+     */
     void run(bool async);
-private:
+private: // udokumentowane w csgi.cpp
     void serve();
     Env  parse_request(SSL*);
     void send_response(Response&, SSL*);

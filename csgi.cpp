@@ -59,6 +59,9 @@ void CSGI::Server::run(bool async)
     }
 }
 
+/**
+ * Pętla główna serwera
+ */
 void CSGI::Server::serve()
 {
     int newfd;
@@ -94,6 +97,13 @@ void CSGI::Server::serve()
     }
 }
 
+/**
+ * Parsowanie zapytania HTTP
+ *
+ * @param ssl handler SSL z którego czytane będą dane
+ *
+ * @return struktura CSGI::Env z parametrami zapytania
+ */
 CSGI::Env CSGI::Server::parse_request(SSL *ssl)
 {
     CSGI::Env env;
@@ -161,6 +171,12 @@ CSGI::Env CSGI::Server::parse_request(SSL *ssl)
     return env;
 }
 
+/**
+ * Wysyłanie odpowiedzi do klienta
+ *
+ * @param resp obiekt CSGI::Response z odpowiedzią
+ * @param ssl  handler ssl do którego wysłane będą dane
+ */
 void CSGI::Server::send_response(Response& resp, SSL *ssl) {
     std::stringstream out;
     out << "HTTP/1.1 " << resp.status << " OK\r\n";
