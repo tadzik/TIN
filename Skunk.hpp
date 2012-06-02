@@ -157,6 +157,10 @@ struct RadioButton : Widget {
 
     virtual std::string GET() {
         std::stringstream id_str;
+        std::stringstream i_str;
+        std::stringstream count;
+        
+        count << this->getElemsNum();
         id_str << this ->id_;
         std::string html = "";
         html.append("<b>"+ title +"</b><br />\n");
@@ -167,18 +171,32 @@ struct RadioButton : Widget {
             html.append(" value='");
             html.append(""+ itoa(i));
             html.append("' ");
-            if(this->isDefault(i)) html.append("checked ");
-            html.append(" id='i");           /// id tylko dla javascriptu
+            if(this->isDefault(i)) html.append("checked = 'checked' ");
+            html.append("id='");
             html.append(id_str.str());
-            html.append("'/>");
+            html.append("_");
+            i_str.str("") ;
+            i_str << i;
+            html.append(i_str.str());
+            html.append("'");
+            html.append("/>");
             html.append(this->getValue(i));
             html.append("<br />\n");
+            
+            
+            html.append("<input type='hidden' id='radio_count' value='");
+            html.append(count.str());
+            html.append("'/>\n");
             
             html.append("<input type='hidden' name='id");
             html.append(id_str.str());
             html.append("_changed' ");
             html.append("id='i");           /// id tylko dla javascriptu
             html.append(id_str.str());
+            html.append("_");
+            i_str.str("") ;
+            i_str << i;
+            html.append(i_str.str());
             html.append("_changed'");
             html.append(" value='false'/>\n");
         }

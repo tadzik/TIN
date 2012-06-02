@@ -116,11 +116,32 @@ CSGI::Response Skunk::Server::get(CSGI::Env& env) {
     resp.content.append("jQuery(document).bind('ready',function(){\n");
     resp.content.append("var count = $('#wid_count').attr('value');\n");
     resp.content.append("var i;\n");
-    resp.content.append("for (i=1;i<count-1;++i){\n");
+    resp.content.append("var change_id;\n");
+    resp.content.append("var radio_count = $('#radio_count').attr('value');\n");
+    
+    resp.content.append("for (i=0;i<count;++i){\n");
     resp.content.append("$('#i'+i).change(function(){\n");
-    resp.content.append("$('#i'+i+'_changed').val('true');");
-
+    
+    resp.content.append("change_id = $(this).attr('id');\n");
+    resp.content.append("$('#'+change_id+'_changed').val('true');\n");
+    
+    
     resp.content.append("});\n");
+    
+        resp.content.append("for (j=0;j<=radio_count;++j){\n");                    ///wewnetrzny for dla radio radio_count
+        resp.content.append("$('#i'+i+'_'+j).click(function(){\n");
+        resp.content.append("alert('zmieniam');");
+    
+        resp.content.append("change_id = $(this).attr('id');\n");
+        resp.content.append("alert(change_id);");
+        resp.content.append("$('#'+change_id+'_changed').val('true');\n");
+    
+    
+        resp.content.append("});\n");
+        resp.content.append("}\n");         
+    
+    
+    
     resp.content.append("}\n");
     
     
