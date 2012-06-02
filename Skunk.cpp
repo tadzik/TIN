@@ -93,10 +93,10 @@ CSGI::Response Skunk::Server::get(CSGI::Env& env) {
         }
     }
     std::cout << username <<std::endl;
-    resp.content.append("\n\t\t\t<input type='submit' value='Zmień'/>");
+    resp.content.append("\n\t\t\t<input type='submit' value='Zmien'/>");
     resp.content.append("\n\t\t</form>");
     if(username == "admin"){
-        resp.content.append("\n\n\n<a href='/adduser'>Add new user</a>");
+        resp.content.append("\n\n\n<a href='/adduser' id='useradd' >Add new user</a>");
     }
 
     resp.content.append("<form method='post' action='/logout'>");
@@ -227,7 +227,7 @@ CSGI::Response addNewUser(){
     resp.content.append("<form method='post' action='/adduser'>");
 
     resp.content.append("<p style='position:absolute; left:0px; top:0px;'> New username: <input name='user' type='text'/></p><br />");
-    resp.content.append("<p style='position:absolute; left:300px;top:0px;'> Password: <input name='pass' type='text' /></p>"
+    resp.content.append("<p style='position:absolute; left:500px;top:0px;'> Password: <input name='pass' type='text' /></p>"
                         "<br />");
 
     resp.content.append("<input style='postition:absolute; left:0px; top:50px;' type='submit' value='Utworz nowego usera'/>");

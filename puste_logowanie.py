@@ -14,5 +14,6 @@ def testuj_puste_logowanie():
     click_element(submit)
     sleep(3)
     go_to(base_url)
+    assert_element(tag='input', value='Logout', type='submit')
 
 testuj_puste_logowanie()
