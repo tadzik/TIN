@@ -6,6 +6,16 @@
 
 #include "csgi.hpp"
 
+/**
+ * @file Skunk.hpp
+ * */
+
+
+/**
+ * Konwerter z typu int na typ string
+ * @param i - podany int
+ * @return przekonwertowany string
+ * */
 static std::string itoa(int i) {
     std::stringstream str;
     str << i;
@@ -14,12 +24,25 @@ static std::string itoa(int i) {
 
 namespace Skunk {
 
+/**
+ * struktura przechowujace widgety
+ * kazdy posiada metody obslugujace GET i POST
+ * oraz swoje ID
+ * */
 struct Widget {
     virtual std::string GET()              = 0;
     virtual void        POST(std::string&) = 0;
     int id_;
 };
 
+
+/**
+ * Struktura implementujace metody
+ * verify - weryfikujaca
+ * canPOST - sprawdzajaca czy uzytkownik ma dostep do metody POST
+ * canGET - sprawdzajaca czy uzytkownik ma dostep odczytu przez GET
+ * addUser - dodawanie uzytkownikow przez admina
+ * */
 struct Auth {
     virtual bool verify(std::string&, std::string&) = 0;
     virtual bool canGET(std::string&,  int)         = 0;
@@ -27,6 +50,10 @@ struct Auth {
     virtual void addUser(std::string , std::string ) = 0;
 };
 
+
+/**
+ * 
+ * */
 struct SimpleAuth : Auth {
     std::map<std::string, std::string> users_;
 
@@ -51,6 +78,11 @@ struct SimpleAuth : Auth {
     }
 };
 
+
+/**
+ * Struktura przechowujaca metody umozliwiajace realizacje pola 
+ * tekstowego, lacznie z jego wyswietlaniem
+ * */
 struct TextField : Widget {
     virtual std::string getValue() = 0;
     virtual void        setValue(std::string&) { };
@@ -74,6 +106,11 @@ struct TextField : Widget {
     }
 };
 
+
+/**
+ * Struktura przechowujaca metody umozliwiajace realizacje 
+ * pola wyboru typu radio
+ * */
 struct RadioButton : Widget {
     std::vector<std::string> listaWyboru;
     int index;
@@ -133,6 +170,10 @@ struct RadioButton : Widget {
     }
 };
 
+
+/**
+ * Klasa ktora dodaje nowe funkcjonalnosci do serwera CSGI
+ * */
 class Server : CSGI::Application {
     std::vector<Widget *> widgets_;
     std::map<std::string, Widget*>     widgets_map_;
