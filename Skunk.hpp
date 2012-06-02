@@ -96,7 +96,17 @@ struct TextField : Widget {
         html.append(id_str.str());
         html.append("' value='");
         html.append(this->getValue());
+        html.append("' id='i");           /// id tylko dla javascriptu
+        html.append(id_str.str());
         html.append("'/>\n");
+        
+        html.append("<input type='hidden' name='id");
+        html.append(id_str.str());
+        html.append("_changed' ");
+        html.append("id='i");           /// id tylko dla javascriptu
+        html.append(id_str.str());
+        html.append("_changed'");
+        html.append(" value='false'/>\n");
 
         return html;
     }
@@ -158,9 +168,19 @@ struct RadioButton : Widget {
             html.append(""+ itoa(i));
             html.append("' ");
             if(this->isDefault(i)) html.append("checked ");
-            html.append("/>");
+            html.append(" id='i");           /// id tylko dla javascriptu
+            html.append(id_str.str());
+            html.append("'/>");
             html.append(this->getValue(i));
             html.append("<br />\n");
+            
+            html.append("<input type='hidden' name='id");
+            html.append(id_str.str());
+            html.append("_changed' ");
+            html.append("id='i");           /// id tylko dla javascriptu
+            html.append(id_str.str());
+            html.append("_changed'");
+            html.append(" value='false'/>\n");
         }
         return html;
     }

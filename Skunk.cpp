@@ -75,12 +75,14 @@ int Skunk::Server::addWidget(Skunk::Widget *w) {
  * */
 CSGI::Response Skunk::Server::get(CSGI::Env& env) {
     CSGI::Response resp;
-
+    int count; 
+    std::stringstream id_str;
     resp.status = 200;
     std::vector<Skunk::Widget *>::iterator it;
 
-    resp.content.append("<!DOCTYPE html>\n<html>\n");
+    resp.content.append("<html>\n");
     resp.content.append("\t<head><title>2012 TIN SERVER</title></head>\n");
+    resp.content.append("<script type='text/javascript' src='http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js'></script>");
     resp.content.append("\t<body>");
     resp.content.append("\n\t\t<form method='post' action='/'>\n");
 
@@ -92,7 +94,13 @@ CSGI::Response Skunk::Server::get(CSGI::Env& env) {
             resp.content.append("<hr/>");
         }
     }
-    std::cout << username <<std::endl;
+    
+    count = widgets_.size();
+    id_str << count;
+    resp.content.append("<input type='hidden' name='count' id='wid_count' value='");
+    resp.content.append(id_str.str());
+    resp.content.append("'/>");
+    
     resp.content.append("\n\t\t\t<input type='submit' value='Zmien'/>");
     resp.content.append("\n\t\t</form>");
     if(username == "admin"){
@@ -101,8 +109,26 @@ CSGI::Response Skunk::Server::get(CSGI::Env& env) {
 
     resp.content.append("<form method='post' action='/logout'>");
     resp.content.append("<input type='submit' value='Logout'/>");
-    resp.content.append("</form>");
+    resp.content.append("</form>\n");
 
+    
+    resp.content.append("<script type='text/javascript'>\n");
+    resp.content.append("jQuery(document).bind('ready',function(){\n");
+    resp.content.append("var count = $('#wid_count').attr('value');\n");
+    resp.content.append("var i;\n");
+    resp.content.append("for (i=1;i<count-1;++i){\n");
+    resp.content.append("$('#i'+i).change(function(){\n");
+    resp.content.append("$('#i'+i+'_changed').val('true');");
+
+    resp.content.append("});\n");
+    resp.content.append("}\n");
+    
+    
+    ///(value).attr('src'));
+    
+    resp.content.append("});\n");
+    resp.content.append("</script>\n");
+    
     resp.content.append("\n\t</body>\n</html>\n");
 
     resp.headers["Content-Type"]   = "text/html";
