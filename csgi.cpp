@@ -53,7 +53,7 @@ void CSGI::Server::run(bool async)
         throw CSGI::Exception(err);
     }
     if (async) {
-        if (fork() == 0) serve();
+        if ((pid_ = fork()) == 0) serve();
     } else {
         serve();
     }
@@ -110,7 +110,7 @@ CSGI::Env CSGI::Server::parse_request(SSL *ssl)
     std::stringstream s;
     char buf[4096];
     
-    int  ret = SSL_read(ssl, buf, sizeof(buf) - 1);
+    int ret = SSL_read(ssl, buf, sizeof(buf) - 1);
     if (ret == -1) {
         throw CSGI::InvalidRequest();
     }

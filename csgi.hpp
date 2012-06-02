@@ -8,6 +8,7 @@
 
 #include <sys/types.h>
 #include <sys/socket.h>
+#include <signal.h>
 #include <netdb.h>
 #include <netinet/in.h>
 #include <unistd.h>
@@ -16,6 +17,8 @@
 
 #include <openssl/ssl.h>
 #include <openssl/err.h>
+
+#include <iostream> // FIXME REMOVEME
 
 /**
  * @file csgi.hpp
@@ -94,7 +97,7 @@ public:
         ssl_method_ = (SSL_METHOD*)SSLv3_server_method();
         ssl_ctx_    = SSL_CTX_new(ssl_method_);
         if (ssl_ctx_ == NULL) {
-            throw CSGI::Exception("FUCKUP");
+            throw CSGI::Exception("Could not initialize SSL context");
         }
 
         SSL_CTX_use_certificate_file(ssl_ctx_, "cert.pem",
@@ -103,10 +106,21 @@ public:
                                     SSL_FILETYPE_PEM);
 
         if (!SSL_CTX_check_private_key(ssl_ctx_)) {
-            throw CSGI::Exception("Well, fuck");
+            throw CSGI::Exception("Error checking private key");
         }
 
-        ssl_ = SSL_new(ssl_ctx_);
+        pid_ = -1;
+    }
+
+    ~Server()
+    {
+        std::cerr << "Cleaning up\n" << std::endl;
+        if (pid_ != -1) {
+            kill(pid_, SIGTERM);
+        }
+        close(sockfd_);
+        freeaddrinfo(res_);
+        SSL_CTX_free(ssl_ctx_);
     }
 
     /**
@@ -125,10 +139,10 @@ private: // udokumentowane w csgi.cpp
     int sockfd_;
     int port_;
     int backlog_;
+    int pid_;
 
     SSL_METHOD *ssl_method_;
     SSL_CTX    *ssl_ctx_;
-    SSL        *ssl_;
 };
 
 } //namespace
