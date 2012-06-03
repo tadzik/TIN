@@ -76,7 +76,7 @@ int main()
     assert_found(dispatcher,  "another/");
     assert_found(dispatcher,  "another");
 
-    assert_status(dispatcher, "dupa", 404);
+    assert_status(dispatcher, "czosnek", 404);
 
     std::cerr << "All tests OK" << std::endl;
 
