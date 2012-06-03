@@ -322,12 +322,13 @@ CSGI::Response Skunk::Server::operator()(CSGI::Env& env) {
     }
     if (env["REQUEST_METHOD"].compare("POST") == 0) {
         StringMap data  = parsePostData(env);
-        StringMap::iterator it;
-        for (it = data.begin(); it != data.end(); it++) {
-            Widget *w = widgets_map_[it->first];
-            if (w != NULL) {
+        for (int i = 0; i < nextID_; i++) {
+            std::string id  = "id" + itoa(i);
+            std::string idc = id + "_changed";
+            if (data[idc].compare("true") == 0) {
+                Widget *w = widgets_map_[id];
                 if (auth_->canPOST(username, w->id_)) {
-                    std::string decoded = urldecoder(it->second);
+                    std::string decoded = urldecoder(data[id]);
                     w->POST(decoded);
                 }
             }
