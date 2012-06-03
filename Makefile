@@ -33,4 +33,4 @@ test: skunk_test Selenium_test.py
 	killall -q skunk_test || true
 
 clean:
-	rm -f *.o app dispatcher_test
+	rm -f *.o app dispatcher_test skunk_test
