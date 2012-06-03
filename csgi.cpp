@@ -97,6 +97,20 @@ void CSGI::Server::serve()
     }
 }
 
+bool can_read(int fd) {
+    if (fd < 0) {
+        std::cerr << "lol what" << std::endl;
+    }
+    fd_set fds;
+    struct timeval tv;
+    FD_ZERO(&fds);
+    FD_SET(fd, &fds);
+    tv.tv_sec  = 0;
+    tv.tv_usec = 250000;
+
+    return select(fd + 1, &fds, NULL, NULL, &tv);
+}
+
 /**
  * Parsowanie zapytania HTTP
  *
@@ -109,22 +123,20 @@ CSGI::Env CSGI::Server::parse_request(SSL *ssl)
     CSGI::Env env;
     std::stringstream s;
     char buf[4096];
-    
-    int ret = SSL_read(ssl, buf, sizeof(buf) - 1);
-    if (ret == -1) {
+    int ret;
+
+    if (!can_read(SSL_get_rfd(ssl))) {
         throw CSGI::InvalidRequest();
     }
-    buf[ret] = '\0';
-    s << std::string(buf);
 
-    if (ret < 5) { // dirty hack, I hope it's a temporary solution
+    do {
         ret = SSL_read(ssl, buf, sizeof(buf) - 1);
-        if (ret == -1) {
+        if (ret < 0) {
             throw CSGI::InvalidRequest();
         }
         buf[ret] = '\0';
         s << std::string(buf);
-    }
+    } while (can_read(SSL_get_rfd(ssl)));
 
     std::string line;
     getline(s, line);
