@@ -73,7 +73,7 @@ int Skunk::Server::addWidget(Skunk::Widget *w) {
  * @return zwraca odpowiedz serwera
  * 
  * */
-CSGI::Response Skunk::Server::get(CSGI::Env& env) {
+CSGI::Response Skunk::Server::get(CSGI::Env& env, std::string& username) {
     CSGI::Response resp;
     int count; 
     std::stringstream id_str;
@@ -86,7 +86,6 @@ CSGI::Response Skunk::Server::get(CSGI::Env& env) {
     resp.content.append("\t<body>");
     resp.content.append("\n\t\t<form method='post' action='/'>\n");
 
-    std::string username = isAuthed(env);
     for (it = widgets_.begin(); it != widgets_.end(); it++) {
         Skunk::Widget *w = *it;
         if (auth_->canGET(username, w->id_)) {
@@ -345,7 +344,7 @@ CSGI::Response Skunk::Server::operator()(CSGI::Env& env) {
         }
     }
     
-    CSGI::Response resp = this->get(env);
+    CSGI::Response resp = this->get(env, username);
     if (session.length() > 0)
         resp.headers["Set-Cookie"] = "sessionid=" + session
                                    + "; Max-Age=" + itoa(5*60);
