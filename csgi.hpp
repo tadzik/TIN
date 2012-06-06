@@ -19,6 +19,7 @@
 #include <openssl/err.h>
 
 #include <iostream> // FIXME REMOVEME
+#include <pthread.h>
 
 /**
  * @file csgi.hpp
@@ -109,15 +110,16 @@ public:
             throw CSGI::Exception("Error checking private key");
         }
 
-        pid_ = -1;
+        worker_ = NULL;
     }
 
     ~Server()
     {
         std::cerr << "Cleaning up\n" << std::endl;
-        if (pid_ != -1) {
-            kill(pid_, SIGTERM);
-        }
+        //FIXME
+        //if (pid_ != -1) {
+        //    kill(pid_, SIGTERM);
+        //}
         close(sockfd_);
         freeaddrinfo(res_);
         SSL_CTX_free(ssl_ctx_);
@@ -130,8 +132,8 @@ public:
      *              jeśli nie, wywołanie jest blokujące
      */
     void run(bool async);
-private: // udokumentowane w csgi.cpp
     void serve();
+private: // udokumentowane w csgi.cpp
     Env  parse_request(SSL*);
     void send_response(Response&, SSL*);
     Application *app_;
@@ -139,8 +141,8 @@ private: // udokumentowane w csgi.cpp
     int sockfd_;
     int port_;
     int backlog_;
-    int pid_;
 
+    pthread_t  *worker_;
     SSL_METHOD *ssl_method_;
     SSL_CTX    *ssl_ctx_;
 };

@@ -1,6 +1,6 @@
 CXX?=clang++
 CFLAGS=-Wall -Wextra -pedantic -ggdb
-LDFLAGS=-lssl -lcrypto
+LDFLAGS=-lssl -lcrypto -lpthread
 COMPILE= $(CXX) $(CFLAGS)
 
 all: app skunk_test

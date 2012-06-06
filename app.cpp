@@ -2,7 +2,12 @@
 #include <iostream>
 
 class MyApp : public CSGI::Application {
+    int counter_;
 public:
+    MyApp() : counter_(0) { }
+
+    int increment() { return ++counter_; }
+
     virtual CSGI::Response operator()(CSGI::Env& env)
     {
         CSGI::Response resp;
@@ -21,6 +26,10 @@ public:
         }
 
         resp.content = "Hello, world!";
+        resp.content.append(" Counter = ");
+        std::stringstream counter;
+        counter << counter_;
+        resp.content.append(counter.str());
 
         std::stringstream len;
         len << resp.content.length();
@@ -35,13 +44,17 @@ public:
 
 int main()
 {
-    CSGI::Application *app = new MyApp;
+    MyApp *app = new MyApp;
     CSGI::Server srv(app, 8080);
     try {
-        srv.run(false);
+        srv.run(true);
     } catch (CSGI::Exception& e) {
         std::cerr << e.what() << std::endl;
         return 1;
+    }
+    for (;;) {
+        sleep(1);
+        std::cerr << "counter is now " << app->increment() << std::endl;
     }
     std::cerr << "Server running on port 8080" << std::endl;
     return 0;

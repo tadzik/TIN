@@ -1,5 +1,12 @@
 #include "csgi.hpp"
 
+void *run_thread(void *arg)
+{
+    CSGI::Server *srv = (CSGI::Server *)arg;
+    srv->serve();
+    return NULL;
+}
+
 void CSGI::Server::run(bool async)
 {
     int i;
@@ -53,7 +60,8 @@ void CSGI::Server::run(bool async)
         throw CSGI::Exception(err);
     }
     if (async) {
-        if ((pid_ = fork()) == 0) serve();
+        worker_ = (pthread_t *)malloc(sizeof(pthread_t));
+        pthread_create(worker_, NULL, run_thread, (void*)this);
     } else {
         serve();
     }
@@ -98,9 +106,6 @@ void CSGI::Server::serve()
 }
 
 bool can_read(int fd) {
-    if (fd < 0) {
-        std::cerr << "lol what" << std::endl;
-    }
     fd_set fds;
     struct timeval tv;
     FD_ZERO(&fds);
