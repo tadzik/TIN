@@ -52,10 +52,11 @@ int main()
         std::cerr << e.what() << std::endl;
         return 1;
     }
-    for (;;) {
+    for (int i = 0; i < 10; i++) {
         sleep(1);
         std::cerr << "counter is now " << app->increment() << std::endl;
     }
-    std::cerr << "Server running on port 8080" << std::endl;
+    std::cerr << "App cleaning up" << std::endl;
+    delete app;
     return 0;
 }

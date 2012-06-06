@@ -1,5 +1,7 @@
 #include "csgi.hpp"
 
+bool can_read(int fd);
+
 void *run_thread(void *arg)
 {
     CSGI::Server *srv = (CSGI::Server *)arg;
@@ -75,7 +77,13 @@ void CSGI::Server::serve()
     int newfd;
 
     for (;;) {
+        if (stop_) {
+            //std::cerr << "serve() stopping" << std::endl;
+            return;
+        }
         SSL *ssl = SSL_new(ssl_ctx_);
+        // so we check stop_
+        if (!can_read(sockfd_)) continue;
         newfd    = accept(sockfd_, 0, 0);
         SSL_set_fd(ssl, newfd);
         int err = SSL_accept(ssl);

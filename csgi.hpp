@@ -111,15 +111,18 @@ public:
         }
 
         worker_ = NULL;
+        stop_   = 0;
     }
 
     ~Server()
     {
-        std::cerr << "Cleaning up\n" << std::endl;
-        //FIXME
-        //if (pid_ != -1) {
-        //    kill(pid_, SIGTERM);
-        //}
+        //std::cerr << "Cleaning up" << std::endl;
+        if (worker_ != NULL) {
+            stop_ = 1;
+            pthread_join(*worker_, NULL);
+            free(worker_);
+            //std::cerr << "Child returned" << std::endl;
+        }
         close(sockfd_);
         freeaddrinfo(res_);
         SSL_CTX_free(ssl_ctx_);
@@ -141,6 +144,7 @@ private: // udokumentowane w csgi.cpp
     int sockfd_;
     int port_;
     int backlog_;
+    int stop_;
 
     pthread_t  *worker_;
     SSL_METHOD *ssl_method_;
