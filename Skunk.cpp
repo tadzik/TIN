@@ -359,6 +359,6 @@ CSGI::Response Skunk::Server::operator()(CSGI::Env& env) {
  * Uruchamia server CSGI
  * */
 void Skunk::Server::run(bool async) {
-    CSGI::Server srv(this, 8080);
-    srv.run(async);
+    srv = new CSGI::Server(this, 8080);
+    srv->run(async);
 }

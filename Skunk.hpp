@@ -218,6 +218,7 @@ class Server : CSGI::Application {
     std::map<std::string, std::string> sessions_;
     Auth * auth_;
     int nextID_;
+    CSGI::Server *srv;
 public:
     Server() : nextID_(0) { };
     int addWidget(Widget *);
