@@ -1,5 +1,5 @@
 CXX?=clang++
-CFLAGS=-Wall -Wextra -pedantic -ggdb
+CFLAGS=-Wall -Wextra -pedantic -ggdb -std=c++0x
 LDFLAGS=-lssl -lcrypto -lpthread
 COMPILE= $(CXX) $(CFLAGS)
 

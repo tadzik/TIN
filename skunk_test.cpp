@@ -75,5 +75,14 @@ int main(void) {
 
     srv->setAuth(auth);
 
-    srv->run(false);
+    srv->run(true);
+    for(;;){
+	    srv->pause();
+	    std::cout<<"pause"<<std::endl;
+	    sleep(5);
+	    srv->unpause();
+	    std::cout<<"unpause"<<std::endl;
+	    sleep(5);
+    }
+
 }
