@@ -224,7 +224,7 @@ public:
     void setAuth(Auth *a) { auth_ = a; }
     std::string isAuthed(CSGI::Env&);
     void removeSession(CSGI::Env&);
-    void run();
+    void run(bool);
     CSGI::Response get(CSGI::Env&, std::string&);
     virtual CSGI::Response operator()(CSGI::Env&);
 };

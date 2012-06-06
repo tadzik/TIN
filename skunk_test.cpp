@@ -75,5 +75,5 @@ int main(void) {
 
     srv->setAuth(auth);
 
-    srv->run();
+    srv->run(false);
 }
