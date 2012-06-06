@@ -59,9 +59,11 @@ class WielkiNapis : public Skunk::Widget {
  * */
 int main(void) {
     Skunk::Server *srv = new Skunk::Server();
+    PoleTekstowe *pt1 = new PoleTekstowe("text1");
+    PoleTekstowe *pt2 = new PoleTekstowe("text2");
     srv->addWidget(new WielkiNapis());
-    srv->addWidget(new PoleTekstowe("text1"));
-    srv->addWidget(new PoleTekstowe("text2"));
+    srv->addWidget(pt1);
+    srv->addWidget(pt2);
     PoleRadiowe *pr = new PoleRadiowe();
     srv->addWidget(pr);
     pr->setTitle("Preferencje");
@@ -75,5 +77,19 @@ int main(void) {
 
     srv->setAuth(auth);
 
-    srv->run(false);
+    printf("running server\n");
+    srv->run(true);
+    
+    int i=0;
+    std::string napis = "kurwa";
+    std::string tmp;
+    for(;;){
+        sleep(10);
+        //pt1->blockWidget();
+        std::cout << pt1->getValue() << std::endl;
+        tmp = pt1->getValue() + itoa(i++);
+        pt1->setValue(tmp);
+        //pt1->unlockWidget();
+        //printf("%s: \n",pt1->getValue());
+    }
 }

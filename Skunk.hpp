@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <pthread.h>
 
 #include "csgi.hpp"
 
@@ -32,7 +33,14 @@ namespace Skunk {
 struct Widget {
     virtual std::string GET()              = 0;
     virtual void        POST(std::string&) = 0;
-    int id_;
+    int id_, rc;
+    pthread_mutex_t mutex;
+    void blockWidget(pthread_mutex_t mutex){
+        rc = pthread_mutex_lock(&mutex);
+    }
+    void unlockWidget(pthread_mutex_t mutex){
+        rc = pthread_mutex_unlock(&mutex);
+    }
 };
 
 
@@ -90,6 +98,7 @@ struct TextField : Widget {
     virtual std::string GET() {
         std::stringstream id_str;
         id_str << this->id_;
+        blockWidget(mutex);   
 
         std::string html = "";
         html.append("<input type='text' name='id");
@@ -107,12 +116,14 @@ struct TextField : Widget {
         html.append(id_str.str());
         html.append("_changed'");
         html.append(" value='false'/>\n");
-
+        unlockWidget(mutex);
         return html;
     }
 
     virtual void POST(std::string& s) {
+        blockWidget(mutex);
         this->setValue(s);
+        unlockWidget(mutex);
     }
 };
 
@@ -160,6 +171,7 @@ struct RadioButton : Widget {
         std::stringstream i_str;
         std::stringstream count;
         
+        blockWidget(mutex);
         count << this->getElemsNum();
         id_str << this ->id_;
         std::string html = "";
@@ -200,11 +212,14 @@ struct RadioButton : Widget {
             html.append("_changed'");
             html.append(" value='false'/>\n");
         }
+        unlockWidget(mutex);
         return html;
     }
 
     virtual void POST(std::string& s) {
+        blockWidget(mutex);
         this->setValue(atoi(s.c_str()));
+        unlockWidget(mutex);
     }
 };
 
