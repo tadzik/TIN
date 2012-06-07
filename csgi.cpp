@@ -8,12 +8,40 @@ void *run_thread(void *arg)
     srv->serve();
     return NULL;
 }
+
+void safe_write(int fd, const char *buf, size_t len)
+{
+    size_t sent = 0;
+    while (sent < len) {
+        sent += write(fd, &buf[sent], len - sent);
+    }
+}
+
+void safe_SSL_write(SSL *ssl, const char *buf, size_t len)
+{
+    if (len == 0) return; // undefined behaviour in SSL_write
+    int ret;
+    for (;;) {
+        ret = SSL_write(ssl, buf, len);
+        if (ret >= 0) return;
+        if (ret < 0) {
+            if (SSL_get_error(ssl, ret) == SSL_ERROR_WANT_WRITE) {
+                continue;
+            } else {
+                return;
+            }
+        }
+    }
+}
+
 void CSGI::Server::pause(){
 	pthread_mutex_lock(&pause_);
 }
+
 void CSGI::Server::unpause(){
 	pthread_mutex_unlock(&pause_);
 }
+
 void CSGI::Server::run(bool async)
 {
     int i;
@@ -100,7 +128,7 @@ void CSGI::Server::serve()
             res.append("SSL error: ");
             res.append(ERR_error_string(SSL_get_error(ssl, err), 0));
             res.append("\r\n");
-            write(newfd, res.c_str(), res.length());
+            safe_write(newfd, res.c_str(), res.length());
             close(newfd);
             continue;
         }
@@ -108,7 +136,7 @@ void CSGI::Server::serve()
             env = parse_request(ssl);
         } catch (CSGI::InvalidRequest&) {
             const char *res = "HTTP/1.1 400 Bad Request\r\n\r\nbad request";
-            SSL_write(ssl, res, strlen(res));
+            safe_SSL_write(ssl, res, strlen(res));
             close(newfd);
             continue;
         }
@@ -222,5 +250,5 @@ void CSGI::Server::send_response(Response& resp, SSL *ssl) {
     }
     out << "\r\n";
     out << resp.content << "\r\n";
-    SSL_write(ssl, out.str().c_str(), out.str().length());
+    safe_SSL_write(ssl, out.str().c_str(), out.str().length());
 }
