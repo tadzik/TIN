@@ -90,7 +90,7 @@ public:
     Server(Application * app, int port) : app_(app), port_(port)
     {
         backlog_ = 10;
-
+	pause_ = PTHREAD_MUTEX_INITIALIZER;
         SSL_library_init();
         OpenSSL_add_all_algorithms();
         SSL_load_error_strings();
@@ -136,6 +136,8 @@ public:
      */
     void run(bool async);
     void serve();
+    void pause();
+    void unpause();
 private: // udokumentowane w csgi.cpp
     Env  parse_request(SSL*);
     void send_response(Response&, SSL*);
@@ -145,7 +147,7 @@ private: // udokumentowane w csgi.cpp
     int port_;
     int backlog_;
     int stop_;
-
+    pthread_mutex_t pause_;
     pthread_t  *worker_;
     SSL_METHOD *ssl_method_;
     SSL_CTX    *ssl_ctx_;

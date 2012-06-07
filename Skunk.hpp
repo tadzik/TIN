@@ -243,6 +243,8 @@ public:
     void run(bool);
     CSGI::Response get(CSGI::Env&, std::string&);
     virtual CSGI::Response operator()(CSGI::Env&);
+    void pause(){srv->pause();}
+    void unpause(){srv->unpause();}
 };
 
 }

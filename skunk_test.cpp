@@ -86,6 +86,11 @@ int main(void) {
     for(;;){
         sleep(10);
         //pt1->blockWidget();
+        srv->pause();
+	    std::cout<<"pause"<<std::endl;
+	    sleep(5);
+	    srv->unpause();
+	    std::cout<<"unpause"<<std::endl;
         std::cout << pt1->getValue() << std::endl;
         tmp = pt1->getValue() + itoa(i++);
         pt1->setValue(tmp);
