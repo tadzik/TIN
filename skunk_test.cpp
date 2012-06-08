@@ -1,7 +1,7 @@
 #include "Skunk.hpp"
 #include <string>
 #include <vector>
-
+#include <iostream>
 
 
 /**
@@ -80,21 +80,13 @@ int main(void) {
     printf("running server\n");
     srv->run(true);
     
-    int i=0;
-    std::string napis = "kurwa";
     std::string tmp;
     for(;;){
-        sleep(10);
-        //pt1->blockWidget();
+        sleep(5);
         srv->pause();
 	    std::cout<<"pause"<<std::endl;
 	    sleep(5);
 	    srv->unpause();
 	    std::cout<<"unpause"<<std::endl;
-        std::cout << pt1->getValue() << std::endl;
-        tmp = pt1->getValue() + itoa(i++);
-        pt1->setValue(tmp);
-        //pt1->unlockWidget();
-        //printf("%s: \n",pt1->getValue());
     }
 }
